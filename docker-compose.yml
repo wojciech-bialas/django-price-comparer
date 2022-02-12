@@ -7,13 +7,13 @@ services:
     image: mysql:latest
     restart: always
     volumes:
-      - ./data:/var/lib/mysql
+      - ../data:/data
     ports:
       - '3306:3306'
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_DATABASE: djangoapp-db
-      MYSQL_USER: admin
+      MYSQL_USER: root
       MYSQL_PASSWORD: admin
 
   panel:
@@ -22,7 +22,7 @@ services:
     ports:
       - 80:80
     environment:
-      PMA_USER: admin
+      PMA_USER: root
       PMA_PASSWORD: admin
       PMA_HOST: db
     depends_on:

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<!-- Banner -->
+<section id="banner">
+    <div class="content" style="max-width: 500px;">
+        <header>
+            <h2>Zarejestruj się</h2>
+        </header>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}
