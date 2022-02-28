@@ -21,7 +21,7 @@ from accounts.views import register_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home_view),
+    path('', home_view, name="home"),
     path('compare/add', home_view, name="add-comparison"),
     path('compare/show', home_view, name="show-comparisons"),
 
