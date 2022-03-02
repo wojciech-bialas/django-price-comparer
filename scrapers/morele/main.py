@@ -5,6 +5,7 @@ from selenium.common.exceptions import StaleElementReferenceException
 from time import sleep
 from datetime import date
 import mysql.connector as DB
+import re
 
 
 class MoreleScrapper:
@@ -99,6 +100,15 @@ class MoreleScrapper:
             return table;
             """)
 
+        # get product code from full name
+        codes = []
+        ex = re.compile(r"\((.*)\)")
+        for name in names:
+            result = ex.findall(name)
+            codes.extend(result)
+
+        shop = ['morele']*len(names)
+
         date = [f'{self.today}']*len(names)
 
         return self.make_list_of_tuples(names, links, images, prices, date)
@@ -118,8 +128,8 @@ class MoreleScrapper:
 
     def scrape_laptops(self):
         # open links to subcategories one by one and scrape each of them
-        for x in range(1, len(self.pages)):
-            self.driver.get(f"{self.pages[x]}")
+        # for x in range(1, len(self.pages)):
+        #     self.driver.get(f"{self.pages[x]}")
             for _ in range(1, self.number_of_pages()):
                 sleep(2)
                 products = self.scrape_products_from_page()
@@ -137,8 +147,8 @@ class MoreleScrapper:
         self.conn.commit()
 
     def main(self):
-        self.driver.get("https://morele.net")
-        sleep(10)
+        self.driver.get(self.pages[0])
+        sleep(5)
         self.close_cookie_box()
         self.scrape_laptops()
         self.driver.quit()
