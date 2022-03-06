@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from comparator.views import home_view
+from comparator.views import home_view, add_product
 from accounts.views import register_view
 
 urlpatterns = [
@@ -35,5 +35,6 @@ urlpatterns = [
     # accounts/reset/done/ [name='password_reset_complete']
     path('accounts/', include('django.contrib.auth.urls')),
 
-    path('accounts/register', register_view, name='register')
+    path('accounts/register', register_view, name='register'),
+    path('product/add', add_product, name='add_product')
 ]

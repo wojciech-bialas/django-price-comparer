@@ -1,10 +1,16 @@
+import requests
+from requests.exceptions import RequestException
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
 from time import sleep
 from datetime import date
+
+from urllib3 import Timeout
 import mysql.connector as DB
+import re
+import json
 
 
 class MoreleScrapper:
@@ -15,7 +21,6 @@ class MoreleScrapper:
         self.driver.implicitly_wait(10)
 
         self.action = ActionChains(self.driver)
-        self.today = date.today().strftime("%Y-%m-%d")
         self.conn = DB.connect(user='root', password='admin',
                                     host='127.0.0.1',
                                     database='djangoapp-db')
@@ -99,9 +104,15 @@ class MoreleScrapper:
             return table;
             """)
 
-        date = [f'{self.today}']*len(names)
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        # shop = ['morele']*len(names)
 
-        return self.make_list_of_tuples(names, links, images, prices, date)
+        # date = [f'{self.today}']*len(names)
+
+        # return self.make_list_of_tuples(names, links, images, prices, date)
+        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ProductSerializer(names, links, images, prices, "morele")
+        input('press any key to continue...')
 
     def click_next(self):
         try:
@@ -118,12 +129,15 @@ class MoreleScrapper:
 
     def scrape_laptops(self):
         # open links to subcategories one by one and scrape each of them
-        for x in range(1, len(self.pages)):
-            self.driver.get(f"{self.pages[x]}")
+        # for x in range(1, len(self.pages)):
+        #     self.driver.get(f"{self.pages[x]}")
             for _ in range(1, self.number_of_pages()):
                 sleep(2)
-                products = self.scrape_products_from_page()
-                self.add_to_db(products)
+                # !!!!
+                # products = self.scrape_products_from_page()
+                # self.add_to_db(products)
+                # !!!!
+                self.scrape_products_from_page()
                 self.click_next()
 
     # returns a list of tuples
@@ -137,13 +151,81 @@ class MoreleScrapper:
         self.conn.commit()
 
     def main(self):
-        self.driver.get("https://morele.net")
-        sleep(10)
+        self.driver.get(self.pages[0])
+        sleep(5)
         self.close_cookie_box()
         self.scrape_laptops()
         self.driver.quit()
         self.cur.close()
         self.conn.close()
+
+
+class ProductSerializer:
+
+    def __init__(self, names, links, images, prices, shop) -> None:
+        self.names = names
+        self.links = links
+        self.images = images
+        self.prices = prices
+        self.codes = self.create_codes(self.names)
+        self.shop = shop
+        self.date = date.today().strftime("%Y-%m-%d")
+        self.headers = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
+        self.send_products(names, self.codes)
+
+    def create_codes(self, names):
+        codes = []
+        ex = re.compile(r"\((.*)\)")
+        for name in names:
+            result = ex.findall(name)
+            codes.extend(result)
+        return codes
+
+    def send_products(self, names, codes):
+        val = []
+        for name, code in names, codes:
+            product_dict = {
+                "code": code,
+                "name": name
+            }
+            val.append(product_dict)
+        data = json.dumps(val)
+        try: 
+            r = requests.post("127.0.0.1:8000/product/add", data=data, headers=self.headers)
+            print(r.content)
+        except RequestException as err:
+            print(err.args)
+
+    def send_product_offers(self, links, images):
+        val = []
+        for link, image in links, images:
+            product_offer_dict = {
+                "link": link,
+                "image": image,
+                "shop": self.shop
+            }
+            val.append(product_offer_dict)
+        data = json.dumps(val)
+        try: 
+            r = requests.post("127.0.0.1:8000/productoffer/add", data=data, headers=self.headers)
+            print(r.content)
+        except RequestException as err:
+            print(err.args)
+    
+    def send_product_price(self, prices):
+        val = []
+        for price in prices:
+            product_price_dict = {
+                "price": price,
+                "date": self.date
+            }
+            val.append(product_price_dict)
+        data = json.dumps(val)
+        try: 
+            r = requests.post("127.0.0.1:8000/productprice/add", data=data, headers=self.headers)
+            print(r.content)
+        except RequestException as err:
+            print(err.args)
 
 
 if __name__ == '__main__':

@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # django REST framework
+    'rest_framework',
+
     # own apps
+    'products_api',
     'comparator',
     'accounts',
 ]
@@ -82,7 +86,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djangoapp-db',
-        'USER': 'admin',
+        'USER': 'root',
         'PASSWORD': 'admin',
         'HOST': 'db',
         'PORT': 3306,

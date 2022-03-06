@@ -4,3 +4,4 @@ backports.zoneinfo==0.2.1
 Django==4.0.1
 mysqlclient==2.1.0
 sqlparse==0.4.2
+djangorestframework==3.13.1
