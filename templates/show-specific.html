@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!-- Section -->
+<section>
+    
+    <header class="major">
+        <h2>{{ product.name }}</h2>
+        <h3>{{ product.code }}</h3>
+    </header>
+
+    {% for offer in offers %}
+    <h4>{{ offer.shop }}</h4>
+    <ul>
+        {% for price in prices %}
+        <li>{{ price.price }} - {{ price.date }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+
+</section>
+
+
+{% endblock %}

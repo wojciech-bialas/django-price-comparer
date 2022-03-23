@@ -16,14 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from comparator.views import home_view, add_product
+from comparator.views import home_view, add_product, show_all_products_view, show_product_view
 from accounts.views import register_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name="home"),
-    path('compare/add', home_view, name="add-comparison"),
-    path('compare/show', home_view, name="show-comparisons"),
+    path('compare-products/show-all', show_all_products_view, name="show-all-products"),
+    path('compare-products/<int:num>', show_product_view, name="show-specific"),
 
     # accounts/login/ [name='login']
     # accounts/logout/ [name='logout']
@@ -34,7 +34,7 @@ urlpatterns = [
     # accounts/reset/<uidb64>/<token>/ [name='password_reset_confirm']
     # accounts/reset/done/ [name='password_reset_complete']
     path('accounts/', include('django.contrib.auth.urls')),
-
     path('accounts/register', register_view, name='register'),
+
     path('product/add', add_product, name='add_product')
 ]

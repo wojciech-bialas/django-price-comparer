@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!-- Section -->
+<section>
+    <header class="major">
+        <h2>Wszystkie karty graficzne</h2>
+    </header>
+    <div class="posts">
+        {% for offer in offers %}
+        <article>
+            <img src="{{ offer.image }}" alt="" />
+            <h3>{{ offer.product.name }}</h3>
+            <p>Kod producenta: {{ offer.product.code }}</p>
+            <ul class="actions">
+                <li><a href="{% url 'show-specific' offer.product.pk %}" class="button">Porównaj</a></li>
+            </ul>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+
+{% endblock %}
