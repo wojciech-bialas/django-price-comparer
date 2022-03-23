@@ -6,9 +6,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
 from time import sleep
 from datetime import date
-
 from urllib3 import Timeout
-import mysql.connector as DB
 import re
 import json
 
@@ -19,14 +17,9 @@ class MoreleScrapper:
         self.options = webdriver.FirefoxOptions()
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
-
         self.action = ActionChains(self.driver)
-        self.conn = DB.connect(user='root', password='admin',
-                                    host='127.0.0.1',
-                                    database='djangoapp-db')
-        self.cur = self.conn.cursor()
         self.pages = [
-            'https://www.morele.net/kategoria/karty-graficzne-12/,,,,,,,,0,,,,,sprzedawca:m/2/'
+            'https://www.morele.net/kategoria/karty-graficzne-12/,,,,,,,,0,,,,,sprzedawca:m/'
         ]
         self.main()
 
@@ -104,39 +97,18 @@ class MoreleScrapper:
             return table;
             """)
 
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # shop = ['morele']*len(names)
-
-        # date = [f'{self.today}']*len(names)
-
-        # return self.make_list_of_tuples(names, links, images, prices, date)
-        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         ProductSerializer(names, links, images, prices, "morele")
-        input('press any key to continue...')
 
     def click_next(self):
         try:
-            next_page = self.driver.find_element("xpath",
-                                                 "/html/body/main/div/div[1]/div[2]/div[1]/div[8]/div[2]/ul/li[6]/a/i")
+            next_page = self.driver.find_element("css selector", "ul.pagination.dynamic > li:last-child")
             next_page.click()
-        except NoSuchElementException:
-            try:
-                next_page = self.driver.find_element("xpath",
-                                                     "/html/body/main/div/div[1]/div[2]/div[1]/div[8]/div[2]/ul/li[8]/a/i")
-                next_page.click()
-            except NoSuchElementException:
-                return
+        except NoSuchElementException as err:
+            raise err
 
     def scrape_laptops(self):
-        # open links to subcategories one by one and scrape each of them
-        # for x in range(1, len(self.pages)):
-        #     self.driver.get(f"{self.pages[x]}")
             for _ in range(1, self.number_of_pages()):
                 sleep(2)
-                # !!!!
-                # products = self.scrape_products_from_page()
-                # self.add_to_db(products)
-                # !!!!
                 self.scrape_products_from_page()
                 self.click_next()
 
@@ -156,22 +128,20 @@ class MoreleScrapper:
         self.close_cookie_box()
         self.scrape_laptops()
         self.driver.quit()
-        self.cur.close()
-        self.conn.close()
 
 
 class ProductSerializer:
 
     def __init__(self, names, links, images, prices, shop) -> None:
-        self.names = names
+        self.names = self.create_names(names)
         self.links = links
         self.images = images
         self.prices = prices
-        self.codes = self.create_codes(self.names)
+        self.codes = self.create_codes(names)
         self.shop = shop
         self.date = date.today().strftime("%Y-%m-%d")
         self.headers = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
-        self.send_products(names, self.codes)
+        self.send_products(self.names, self.codes, links, images, prices)
 
     def create_codes(self, names):
         codes = []
@@ -181,48 +151,29 @@ class ProductSerializer:
             codes.extend(result)
         return codes
 
-    def send_products(self, names, codes):
+    def create_names(self, names):
+        new = []
+        for name in names:
+            result = re.split(r"\((.*)\)", name)
+            new.append(result[0].rstrip())
+        return new
+
+    def send_products(self, names, codes, links, images, prices):
         val = []
-        for name, code in names, codes:
+        for (name, code, link, image, price) in zip(names, codes, links, images, prices):
             product_dict = {
                 "code": code,
-                "name": name
+                "name": name,
+                "link": link,
+                "image": image,
+                "shop": self.shop,
+                "price": price,
+                "date": self.date
             }
             val.append(product_dict)
         data = json.dumps(val)
         try: 
-            r = requests.post("127.0.0.1:8000/product/add", data=data, headers=self.headers)
-            print(r.content)
-        except RequestException as err:
-            print(err.args)
-
-    def send_product_offers(self, links, images):
-        val = []
-        for link, image in links, images:
-            product_offer_dict = {
-                "link": link,
-                "image": image,
-                "shop": self.shop
-            }
-            val.append(product_offer_dict)
-        data = json.dumps(val)
-        try: 
-            r = requests.post("127.0.0.1:8000/productoffer/add", data=data, headers=self.headers)
-            print(r.content)
-        except RequestException as err:
-            print(err.args)
-    
-    def send_product_price(self, prices):
-        val = []
-        for price in prices:
-            product_price_dict = {
-                "price": price,
-                "date": self.date
-            }
-            val.append(product_price_dict)
-        data = json.dumps(val)
-        try: 
-            r = requests.post("127.0.0.1:8000/productprice/add", data=data, headers=self.headers)
+            r = requests.post("http://127.0.0.1:8000/product/add", data=data, headers=self.headers)
             print(r.content)
         except RequestException as err:
             print(err.args)
