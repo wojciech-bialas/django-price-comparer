@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # own apps
-    'products_api',
     'comparator',
     'accounts',
 ]

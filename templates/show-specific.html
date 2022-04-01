@@ -2,22 +2,35 @@
 {% block content %}
 {% load static %}
 
-<!-- Section -->
 <section>
-    
+
     <header class="major">
         <h2>{{ product.name }}</h2>
         <h3>{{ product.code }}</h3>
     </header>
 
-    {% for offer in offers %}
+{% for offer in offers %}
+    <span class="image object">
+        <img src="{{ offer.image }}" alt="photo of a gpu" />
+    </span>
+{% endfor %}
+
+{% for offer in offers %}
+
     <h4>{{ offer.shop }}</h4>
+
     <ul>
-        {% for price in prices %}
+    {% for price in prices %}
+
+        {% if price.product_offer.id == offer.id %}
         <li>{{ price.price }} - {{ price.date }}</li>
-        {% endfor %}
-    </ul>
+        {% endif %}
+
     {% endfor %}
+    </ul>
+    <a href="{{ offer.link }}" class="button big" target="_blank" rel="noopener">Przejdź do oferty</a>
+
+{% endfor %}
 
 </section>
 
