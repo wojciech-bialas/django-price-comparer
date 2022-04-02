@@ -23,26 +23,6 @@ class MoreleScrapper:
         ]
         self.main()
 
-    def close_popups(self):
-        sleep(7)
-        close_chat_button = self.driver.find_element("xpath", "/html/body/div[10]/div/div/div[2]/div[1]/button/i")
-        close_chat_button.click()
-        sleep(2)
-        close_gdpr_info = self.driver.find_element("xpath", "/html/body/div[2]/div/div/button")
-        close_gdpr_info.click()
-        sleep(2)
-
-    def navigate_to(self):
-        menu = self.driver.find_element("xpath",
-                                        "/html/body/header/div[2]/div/div/div/nav[1]/div[2]/div[2]/div/ul/li[1]/a/span")
-        submenu = self.driver.find_element("xpath",
-                                           "/html/body/header/div[2]/div/div/div/nav[1]/div[2]/div[2]/div/ul/li[1]/div/div[3]/ul[1]/li[1]/ul/li[1]/a")
-        action = ActionChains(self.driver)
-        action.move_to_element(menu)
-        action.perform()
-        sleep(1)
-        submenu.click()
-
     def close_cookie_box(self):
         try:
             button = self.driver.find_element("xpath", "/html/body/div[5]/div/div/button")
@@ -107,20 +87,10 @@ class MoreleScrapper:
             raise err
 
     def scrape_laptops(self):
-            for _ in range(1, self.number_of_pages()):
-                sleep(2)
-                self.scrape_products_from_page()
-                self.click_next()
-
-    # returns a list of tuples
-    def make_list_of_tuples(self, a, b, c, d, e):
-        return list(zip(a, b, c, d, e))
-
-    def add_to_db(self, iter):
-        self.cur.executemany(f'''INSERT INTO morele
-                             (name, link, image, price, date)
-                             VALUES (%s,%s,%s,%s,%s);''', iter)
-        self.conn.commit()
+        for _ in range(1, self.number_of_pages()):
+            sleep(2)
+            self.scrape_products_from_page()
+            self.click_next()
 
     def main(self):
         self.driver.get(self.pages[0])
@@ -172,7 +142,7 @@ class ProductSerializer:
             }
             val.append(product_dict)
         data = json.dumps(val)
-        try: 
+        try:
             r = requests.post("http://127.0.0.1:8000/product/add", data=data, headers=self.headers)
             print(r.content)
         except RequestException as err:

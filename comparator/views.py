@@ -28,14 +28,14 @@ def add_product(request):
             # product and offer exist, adding current price
             if ProductOffer.objects.filter(product=prod.id, shop=obj['shop']).exists():
                 offer = ProductOffer.objects.get(product=prod.id, shop=obj['shop'])
-                price = ProductPrice(price=obj['price'], date=obj['date'], product_offer=offer)
+                price = ProductPrice(price=obj['price'].replace(',', '.'), date=obj['date'], product_offer=offer)
                 price.save()
 
             # product exists, adding offer and price
             else:
                 offer = ProductOffer(link=obj['link'], image=obj['image'], shop=obj['shop'], product=prod)
                 offer.save()
-                price = ProductPrice(price=obj['price'], date=obj['date'], product_offer=offer)
+                price = ProductPrice(price=obj['price'].replace(',', '.'), date=obj['date'], product_offer=offer)
                 price.save()
 
         else:
@@ -43,7 +43,7 @@ def add_product(request):
             prod.save()
             offer = ProductOffer(link=obj['link'], image=obj['image'], shop=obj['shop'], product=prod)
             offer.save()
-            price = ProductPrice(price=obj['price'], date=obj['date'], product_offer=offer)
+            price = ProductPrice(price=obj['price'].replace(',', '.'), date=obj['date'], product_offer=offer)
             price.save()
 
 
