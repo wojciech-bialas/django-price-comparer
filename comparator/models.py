@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Product(models.Model):
-    code = models.CharField(max_length=50)
+    code = models.CharField(max_length=60)
     name = models.CharField(max_length=120)
 
 class ProductOffer(models.Model):
