@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product, ProductOffer, ProductPrice
@@ -9,7 +10,10 @@ def home_view(request, *args, **kwargs):
 
 def show_all_products_view(request, *args, **kwargs):
     offers = ProductOffer.objects.order_by('product').distinct().all()
-    return render(request, 'show-all.html', {'offers': offers})
+    paginator = Paginator(offers, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'show-all.html', {"page_obj": page_obj})
 
 def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)
