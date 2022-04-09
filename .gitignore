@@ -1,0 +1,6 @@
+accounts/__pycache__/
+accounts/migrations/
+comparator/__pycache__/
+comparator/migrations/
+comparator/migrations/__pycache__/
+djangoapp/__pycache__/
