@@ -2,7 +2,9 @@
 {% block content %}
 {% load static %}
 
+
 <section>
+    <a href="{{ request.META.HTTP_REFERER|escape }}" class="button big">Back</a>
 
     <header class="major">
         <h2>{{ product.name }}</h2>
@@ -10,14 +12,18 @@
     </header>
 
 {% for offer in offers %}
+<div class="offer">
+    <header class="major">
+        <h3>{{ offer.shop|title }}</h4>
+    </header>
+
     <span class="image object">
         <img src="{{ offer.image }}" alt="photo of a gpu" />
     </span>
-{% endfor %}
 
-{% for offer in offers %}
-
-    <h4>{{ offer.shop }}</h4>
+    <span class="image object">
+        <img src='data:image/png;base64,{% cycle charts.0 charts.1 %}'>
+    </span>
 
     <ul>
     {% for price in prices %}
@@ -29,7 +35,7 @@
     {% endfor %}
     </ul>
     <a href="{{ offer.link }}" class="button big" target="_blank" rel="noopener">Przejdź do oferty</a>
-
+</div>    
 {% endfor %}
 
 </section>

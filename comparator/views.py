@@ -1,8 +1,12 @@
+import io, base64
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product, ProductOffer, ProductPrice
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 
 def home_view(request, *args, **kwargs):
@@ -19,7 +23,17 @@ def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)
     offers = ProductOffer.objects.filter(product=product)
     prices = ProductPrice.objects.filter(product_offer__in=offers)
-    return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices})
+    charts = []
+    for offer in offers:
+        pp = ProductPrice.objects.filter(product_offer=offer)
+        prices_list = [x.price for x in pp]
+        dates_list = [x.date for x in pp]
+        fig, ax = plt.subplots(figsize=(10,3))
+        ax = plt.plot(dates_list, prices_list)
+        flike = io.BytesIO()
+        fig.savefig(flike)
+        charts.append(base64.b64encode(flike.getvalue()).decode())
+    return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices, 'charts': charts})
 
 @api_view(['POST'])
 def add_product(request):
