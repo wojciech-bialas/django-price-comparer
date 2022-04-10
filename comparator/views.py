@@ -12,6 +12,14 @@ import matplotlib.pyplot as plt
 def home_view(request, *args, **kwargs):
     return render(request, 'home.html', {})
 
+def search_view(request, *args, **kwargs):
+    p = Product.objects.filter(name__icontains=request.GET.get('query'))
+    results = ProductOffer.objects.filter(product__in=p)
+    paginator = Paginator(results, 25)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'search.html', {"page_obj": page_obj}) 
+
 def show_all_products_view(request, *args, **kwargs):
     offers = ProductOffer.objects.order_by('product').distinct().all()
     paginator = Paginator(offers, 25)

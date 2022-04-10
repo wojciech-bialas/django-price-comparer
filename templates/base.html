@@ -37,8 +37,10 @@
 
         <!-- Search -->
           <section id="search" class="alt">
-            <form method="post" action="#">
-              <input type="text" name="query" id="query" placeholder="Search" />
+            <form method="get" action="{% url 'search' %}">
+              {% csrf_token %}
+              <input type="text" name="query" id="query" placeholder="Wpisz szukaną nazwę" />
+              <button type="submit">Szukaj</button>
             </form>
           </section>
 
@@ -48,13 +50,15 @@
               <h2>Menu</h2>
             </header>
             <ul>
-              <li><a href="/">Homepage</a></li>
-              <li><a href="{% url 'register' %}">Sign Up</a></li>
+              <li><a href="/">Strona Główna</a></li>
+              <li><a href="{% url 'show-all-products' %}">Wszystkie Karty</a></li>
+
+              <li><a href="{% url 'register' %}">Rejestracja</a></li>
               
               {% if request.user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">Logout</a></li>
+                <li><a href="{% url 'logout' %}">Wyloguj</a></li>
               {% else %}
-                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'login' %}">Zaloguj</a></li>
               {% endif %}
             </ul>
           </nav>

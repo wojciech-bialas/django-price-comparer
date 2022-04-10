@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from comparator.views import home_view, add_product, show_all_products_view, show_product_view
+from comparator.views import home_view, add_product, show_all_products_view, show_product_view, search_view
 from accounts.views import register_view
 
 urlpatterns = [
@@ -24,6 +24,7 @@ urlpatterns = [
     path('', home_view, name="home"),
     path('compare-products/show-all', show_all_products_view, name="show-all-products"),
     path('compare-products/<int:num>', show_product_view, name="show-specific"),
+    path('search-result/', search_view, name="search"),
 
     # accounts/login/ [name='login']
     # accounts/logout/ [name='logout']

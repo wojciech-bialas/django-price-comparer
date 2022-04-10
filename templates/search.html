@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<!-- Section -->
+<section>
+    <header class="major">
+        <h2>Wyniki wyszukiwania dla: {{ request.GET.query }}</h2>
+        {% if not page_obj %}
+        <p>Brak wyników.</p>
+        {% endif %}
+    </header>
+
+    <div class="posts">
+        {% for offer in page_obj %}
+        <article>
+            <img src="{{ offer.image }}" alt="" />
+            <h3>{{ offer.product.name }}</h3>
+            <p>Kod producenta: {{ offer.product.code }}</p>
+            <ul class="actions">
+                <li><a href="{% url 'show-specific' offer.product.pk %}" class="button">Porównaj</a></li>
+            </ul>
+        </article>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?query={{ request.GET.query }}&page=1">&laquo; first</a>
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.next_page_number }}">next</a>
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</section>
+
+
+{% endblock %}
