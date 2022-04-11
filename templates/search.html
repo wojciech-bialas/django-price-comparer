@@ -13,6 +13,7 @@
 
     <div class="posts">
         {% for offer in page_obj %}
+        {% ifchanged offer.product.code %}
         <article>
             <img src="{{ offer.image }}" alt="" />
             <h3>{{ offer.product.name }}</h3>
@@ -21,6 +22,7 @@
                 <li><a href="{% url 'show-specific' offer.product.pk %}" class="button">Porównaj</a></li>
             </ul>
         </article>
+        {% endifchanged %}
         {% endfor %}
     </div>
 
