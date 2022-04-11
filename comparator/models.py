@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Product(models.Model):
@@ -15,3 +16,7 @@ class ProductPrice(models.Model):
     price = models.FloatField()
     date = models.DateField()
     product_offer = models.ForeignKey(ProductOffer, on_delete=models.PROTECT)
+
+class ObservedProducts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)

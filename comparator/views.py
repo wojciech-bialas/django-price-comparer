@@ -1,9 +1,11 @@
 import io, base64
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Product, ProductOffer, ProductPrice
+from .models import Product, ProductOffer, ProductPrice, ObservedProducts
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -13,6 +15,8 @@ def home_view(request, *args, **kwargs):
     return render(request, 'home.html', {})
 
 def search_view(request, *args, **kwargs):
+    if not request.GET.get('query'):
+        return render(request, 'search.html', {"page_obj": []})
     p = Product.objects.filter(name__icontains=request.GET.get('query'))
     results = ProductOffer.objects.filter(product__in=p)
     paginator = Paginator(results, 25)
@@ -21,7 +25,7 @@ def search_view(request, *args, **kwargs):
     return render(request, 'search.html', {"page_obj": page_obj}) 
 
 def show_all_products_view(request, *args, **kwargs):
-    offers = ProductOffer.objects.order_by('product').distinct().all()
+    offers = ProductOffer.objects.all()
     paginator = Paginator(offers, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -42,6 +46,23 @@ def show_product_view(request, num, *args, **kwargs):
         fig.savefig(flike)
         charts.append(base64.b64encode(flike.getvalue()).decode())
     return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices, 'charts': charts})
+
+def observe_view(request, num):
+    prod = Product.objects.get(pk=num)
+    try:
+        obs = ObservedProducts.objects.get(
+            Q(user=request.user) & Q(product=prod)
+        )
+    except ObjectDoesNotExist:
+        user = request.user
+        obs = ObservedProducts(user=user, product=prod)
+        obs.save()
+    else:
+        obs = ObservedProducts.objects.get(
+            Q(user=request.user) & Q(product=prod)
+        ).delete()
+    return redirect('show-specific', num=num)
+
 
 @api_view(['POST'])
 def add_product(request):

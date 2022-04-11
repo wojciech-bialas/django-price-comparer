@@ -5,3 +5,11 @@
 div.offer {
     padding-bottom: 2em;
 }
+
+.controls {
+    padding-top: 1em;
+}
+
+.float-right {
+    float: right;
+}
