@@ -5,7 +5,11 @@
 <div class="controls">
     <a href="{{ request.META.HTTP_REFERER|escape }}" class="button big">wróć</a>
     {% if request.user.is_authenticated %}
+    {% if not observed %}
     <a href="{% url 'observe' product.pk %}" class="button float-right">obserwuj</a>
+    {% else %}
+    <a href="{% url 'observe' product.pk %}" class="button float-right">przestań obserwować</a>
+    {% endif %}
     {% endif %}
 </div>
 

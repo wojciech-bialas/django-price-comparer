@@ -35,6 +35,10 @@ def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)
     offers = ProductOffer.objects.filter(product=product)
     prices = ProductPrice.objects.filter(product_offer__in=offers)
+    observed = ObservedProducts.objects.filter(
+        Q(user=request.user) & Q(product=product)
+    )
+
     charts = []
     for offer in offers:
         pp = ProductPrice.objects.filter(product_offer=offer)
@@ -45,7 +49,7 @@ def show_product_view(request, num, *args, **kwargs):
         flike = io.BytesIO()
         fig.savefig(flike)
         charts.append(base64.b64encode(flike.getvalue()).decode())
-    return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices, 'charts': charts})
+    return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices, 'charts': charts, 'observed': observed})
 
 def observe_view(request, num):
     prod = Product.objects.get(pk=num)
@@ -54,15 +58,30 @@ def observe_view(request, num):
             Q(user=request.user) & Q(product=prod)
         )
     except ObjectDoesNotExist:
+        # if product is not observed - observe it
         user = request.user
-        obs = ObservedProducts(user=user, product=prod)
+        price = ProductPrice.objects.filter(product_offer__product=prod).last().price
+        obs = ObservedProducts(user=user, product=prod, price=price)
         obs.save()
     else:
+        # if product is observed - unobserve it
         obs = ObservedProducts.objects.get(
             Q(user=request.user) & Q(product=prod)
         ).delete()
     return redirect('show-specific', num=num)
 
+def user_observed_view(request):
+    observed = list(ObservedProducts.objects.filter(user=request.user).values_list('product', flat=True))
+    products = Product.objects.filter(pk__in=observed)
+    offers = ProductOffer.objects.filter(product__in=products)
+    prices = ProductPrice.objects.filter(product_offer__in=offers)
+    observed_prices = ObservedProducts.objects.filter(
+        Q(user=request.user) & Q(product__in=products)
+    )
+    paginator = Paginator(offers, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'observed.html', {"page_obj": page_obj})
 
 @api_view(['POST'])
 def add_product(request):

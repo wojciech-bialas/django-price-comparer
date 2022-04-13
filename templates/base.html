@@ -56,7 +56,8 @@
               <li><a href="{% url 'register' %}">Rejestracja</a></li>
               
               {% if request.user.is_authenticated %}
-                <li><a href="{% url 'logout' %}">Wyloguj</a></li>
+                <li><a href="{% url 'user-observed' %}">Obserwowane</a></li>
+                <li><a href="{% url 'logout' %}">Wyloguj ({{ request.user.username }})</a></li>
               {% else %}
                 <li><a href="{% url 'login' %}">Zaloguj</a></li>
               {% endif %}
