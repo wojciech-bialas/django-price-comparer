@@ -3,16 +3,30 @@ from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Product, ProductOffer, ProductPrice, ObservedProducts
+from .models import Product, ProductOffer, ProductPrice, ObservedProducts, DatesWhenScraperRun
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from datetime import date
 
 
 def home_view(request, *args, **kwargs):
-    return render(request, 'home.html', {})
+    # all prices for each day
+    run_dates = DatesWhenScraperRun.objects.all()
+    avg_per_day = []
+    dates = []
+    for rd in run_dates:
+        prices = list(ProductPrice.objects.filter(date=rd.date).values_list('price', flat=True))
+        avg_per_day.append(sum(prices) / len(prices))
+        dates.append(rd.date)
+    fig, ax = plt.subplots(figsize=(10,3))
+    ax = plt.plot(dates, avg_per_day)
+    flike = io.BytesIO()
+    fig.savefig(flike)
+    chart = base64.b64encode(flike.getvalue()).decode()
+    return render(request, 'home.html', {"chart": chart})
 
 def search_view(request, *args, **kwargs):
     if not request.GET.get('query'):
@@ -111,6 +125,8 @@ def add_product(request):
             offer.save()
             price = ProductPrice(price=obj['price'].replace(',', '.'), date=obj['date'], product_offer=offer)
             price.save()
-
+    
+    if not DatesWhenScraperRun.objects.filter(date=date.today().strftime("%Y-%m-%d")):
+        DatesWhenScraperRun(date=date.today().strftime("%Y-%m-%d")).save()
 
     return Response({"message": "OK"})
