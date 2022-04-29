@@ -18,9 +18,11 @@ class MoreleScrapper:
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(10)
         self.action = ActionChains(self.driver)
-        self.pages = [
-            'https://www.morele.net/kategoria/karty-graficzne-12/,,,,,,,,0,,,,,sprzedawca:m/'
-        ]
+        self.pages = {
+            'gpu': 'https://www.morele.net/kategoria/karty-graficzne-12/,,,,,,,,0,,,,,sprzedawca:m/',
+            'ram': 'https://www.morele.net/kategoria/pamieci-ram-38/,,,,,,,,0,,,,21239O668024,sprzedawca:m/1/?noi',
+            'cpu': 'https://www.morele.net/kategoria/procesory-45/,,,,,,,,0,,,,,sprzedawca:m/1/'
+        }
         self.main()
 
     def close_cookie_box(self):
@@ -36,7 +38,7 @@ class MoreleScrapper:
         ''')
         return int(pages) if pages is not None else 1
 
-    def scrape_products_from_page(self):
+    def scrape_products_from_page(self, cat):
         names = self.driver.execute_script("""
             let table = [];
             let nodes = document.querySelectorAll('div[data-product-name]');
@@ -77,7 +79,7 @@ class MoreleScrapper:
             return table;
             """)
 
-        ProductSerializer(names, links, images, prices, "morele")
+        ProductSerializer(names, links, images, prices, "morele", cat)
 
     def click_next(self):
         try:
@@ -86,29 +88,31 @@ class MoreleScrapper:
         except NoSuchElementException as err:
             raise err
 
-    def scrape_laptops(self):
-        for _ in range(1, self.number_of_pages()):
-            sleep(2)
-            self.scrape_products_from_page()
-            self.click_next()
-
     def main(self):
-        self.driver.get(self.pages[0])
-        sleep(5)
-        self.close_cookie_box()
-        self.scrape_laptops()
+        for cat, link in self.pages.items():
+            self.driver.get(link)
+            sleep(5)
+            try:
+                self.close_cookie_box()
+            except Exception:
+                pass
+            for _ in range(1, self.number_of_pages()):
+                sleep(2)
+                self.scrape_products_from_page(cat)
+                self.click_next()
         self.driver.quit()
 
 
 class ProductSerializer:
 
-    def __init__(self, names, links, images, prices, shop) -> None:
+    def __init__(self, names, links, images, prices, shop, category) -> None:
         self.names = self.create_names(names)
         self.links = links
         self.images = images
         self.prices = prices
         self.codes = self.create_codes(names)
         self.shop = shop
+        self.category = category
         self.date = date.today().strftime("%Y-%m-%d")
         self.headers = {'Accept' : 'application/json', 'Content-Type' : 'application/json'}
         self.send_products(self.names, self.codes, links, images, prices)
@@ -134,6 +138,7 @@ class ProductSerializer:
             product_dict = {
                 "code": code,
                 "name": name,
+                "category": self.category,
                 "link": link,
                 "image": image,
                 "shop": self.shop,

@@ -16,13 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from comparator.views import home_view, add_product, show_all_products_view, show_product_view, search_view, observe_view, user_observed_view
+from comparator.views import home_view, add_product, show_gpu_view, show_cpu_view, show_ram_view, show_product_view, search_view, observe_view, user_observed_view
 from accounts.views import register_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_view, name="home"),
-    path('compare-products/show-all', show_all_products_view, name="show-all-products"),
+    path('compare-products/show-gpu', show_gpu_view, name="show-gpu"),
+    path('compare-products/show-cpu', show_cpu_view, name="show-cpu"),
+    path('compare-products/show-ram', show_ram_view, name="show-ram"),
     path('compare-products/<int:num>', show_product_view, name="show-specific"),
     path('search-result/', search_view, name="search"),
     path('compare-products/<int:num>/observe', observe_view, name="observe"),

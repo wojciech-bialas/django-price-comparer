@@ -51,8 +51,10 @@
             </header>
             <ul>
               <li><a href="/">Strona Główna</a></li>
-              <li><a href="{% url 'show-all-products' %}">Wszystkie Karty</a></li>
-
+              <li><a href="{% url 'show-gpu' %}">Karty Graficzne</a></li>
+              <li><a href="{% url 'show-cpu' %}">Procesory</a></li>
+              <li><a href="{% url 'show-ram' %}">Pamięci Ram</a></li>
+              
               <li><a href="{% url 'register' %}">Rejestracja</a></li>
               
               {% if request.user.is_authenticated %}

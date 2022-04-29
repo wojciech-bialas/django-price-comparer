@@ -4,6 +4,7 @@ from django.core.paginator import Paginator
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Product, ProductOffer, ProductPrice, ObservedProducts, DatesWhenScraperRun
+from .utils import Chart
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 import matplotlib
@@ -13,20 +14,8 @@ from datetime import date
 
 
 def home_view(request, *args, **kwargs):
-    # all prices for each day
-    run_dates = DatesWhenScraperRun.objects.all()
-    avg_per_day = []
-    dates = []
-    for rd in run_dates:
-        prices = list(ProductPrice.objects.filter(date=rd.date).values_list('price', flat=True))
-        avg_per_day.append(sum(prices) / len(prices))
-        dates.append(rd.date)
-    fig, ax = plt.subplots(figsize=(10,3))
-    ax = plt.plot(dates, avg_per_day)
-    flike = io.BytesIO()
-    fig.savefig(flike)
-    chart = base64.b64encode(flike.getvalue()).decode()
-    return render(request, 'home.html', {"chart": chart})
+    charts = Chart().make_all_cat_charts()
+    return render(request, 'home.html', {"charts": charts})
 
 def search_view(request, *args, **kwargs):
     if not request.GET.get('query'):
@@ -38,8 +27,22 @@ def search_view(request, *args, **kwargs):
     page_obj = paginator.get_page(page_number)
     return render(request, 'search.html', {"page_obj": page_obj}) 
 
-def show_all_products_view(request, *args, **kwargs):
-    offers = ProductOffer.objects.all()
+def show_gpu_view(request, *args, **kwargs):
+    offers = ProductOffer.objects.filter(product__category='gpu')
+    paginator = Paginator(offers, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'show-all.html', {"page_obj": page_obj})
+
+def show_cpu_view(request, *args, **kwargs):
+    offers = ProductOffer.objects.filter(product__category='cpu')
+    paginator = Paginator(offers, 25)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'show-all.html', {"page_obj": page_obj})
+
+def show_ram_view(request, *args, **kwargs):
+    offers = ProductOffer.objects.filter(product__category='ram')
     paginator = Paginator(offers, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -119,7 +122,7 @@ def add_product(request):
                 price.save()
 
         else:
-            prod = Product(code=obj['code'], name=obj['name'])
+            prod = Product(code=obj['code'], name=obj['name'], category=obj['category'])
             prod.save()
             offer = ProductOffer(link=obj['link'], image=obj['image'], shop=obj['shop'], product=prod)
             offer.save()
