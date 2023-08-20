@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'djangoapp-db',
         'USER': 'root',
         'PASSWORD': 'admin',
-        'HOST': 'db',
+        'HOST': '172.18.0.2',
         'PORT': 3306,
     }
 }
@@ -140,3 +140,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Redirect logged in/out users to root url
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
+}
