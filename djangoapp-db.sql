@@ -27,19 +27,19 @@ SET time_zone = "+00:00";
 -- Struktura tabeli dla tabeli `comparator_observedproducts`
 --
 
-CREATE TABLE `comparator_observedproducts` (
-  `id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `user_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- CREATE TABLE `comparator_observedproducts` (
+--   `id` bigint NOT NULL,
+--   `product_id` bigint NOT NULL,
+--   `user_id` int NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Zrzut danych tabeli `comparator_observedproducts`
 --
 
-INSERT INTO `comparator_observedproducts` (`id`, `product_id`, `user_id`) VALUES
-(2, 122, 1),
-(3, 124, 1);
+-- INSERT INTO `comparator_observedproducts` (`id`, `product_id`, `user_id`) VALUES
+-- (2, 122, 1),
+-- (3, 124, 1);
 
 -- --------------------------------------------------------
 
@@ -47,11 +47,11 @@ INSERT INTO `comparator_observedproducts` (`id`, `product_id`, `user_id`) VALUES
 -- Struktura tabeli dla tabeli `comparator_product`
 --
 
-CREATE TABLE `comparator_product` (
-  `id` bigint NOT NULL,
-  `code` varchar(60) NOT NULL,
-  `name` varchar(120) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- CREATE TABLE `comparator_product` (
+--   `id` bigint NOT NULL,
+--   `code` varchar(60) NOT NULL,
+--   `name` varchar(120) NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Zrzut danych tabeli `comparator_product`
@@ -914,13 +914,13 @@ INSERT INTO `comparator_product` (`id`, `code`, `name`) VALUES
 -- Struktura tabeli dla tabeli `comparator_productoffer`
 --
 
-CREATE TABLE `comparator_productoffer` (
-  `id` bigint NOT NULL,
-  `product_id` bigint NOT NULL,
-  `image` varchar(250) NOT NULL,
-  `link` varchar(250) NOT NULL,
-  `shop` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- CREATE TABLE `comparator_productoffer` (
+--   `id` bigint NOT NULL,
+--   `product_id` bigint NOT NULL,
+--   `image` varchar(250) NOT NULL,
+--   `link` varchar(250) NOT NULL,
+--   `shop` varchar(20) NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Zrzut danych tabeli `comparator_productoffer`
@@ -2024,12 +2024,12 @@ INSERT INTO `comparator_productoffer` (`id`, `product_id`, `image`, `link`, `sho
 -- Struktura tabeli dla tabeli `comparator_productprice`
 --
 
-CREATE TABLE `comparator_productprice` (
-  `id` bigint NOT NULL,
-  `product_offer_id` bigint NOT NULL,
-  `date` date NOT NULL,
-  `price` double NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- CREATE TABLE `comparator_productprice` (
+--   `id` bigint NOT NULL,
+--   `product_offer_id` bigint NOT NULL,
+--   `date` date NOT NULL,
+--   `price` double NOT NULL
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Zrzut danych tabeli `comparator_productprice`
@@ -7112,10 +7112,10 @@ INSERT INTO `comparator_productprice` (`id`, `product_offer_id`, `date`, `price`
 --
 -- Indeksy dla tabeli `comparator_observedproducts`
 --
-ALTER TABLE `comparator_observedproducts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `comparator_observedp_product_id_7d8108ce_fk_comparato` (`product_id`),
-  ADD KEY `comparator_observedproducts_user_id_ee112654_fk_auth_user_id` (`user_id`);
+-- ALTER TABLE `comparator_observedproducts`
+--   ADD PRIMARY KEY (`id`),
+--   ADD KEY `comparator_observedp_product_id_7d8108ce_fk_comparato` (`product_id`),
+--   ADD KEY `comparator_observedproducts_user_id_ee112654_fk_auth_user_id` (`user_id`);
 
 --
 -- Indeksy dla tabeli `comparator_product`
@@ -7161,7 +7161,7 @@ ALTER TABLE `comparator_productoffer`
 
 --
 -- AUTO_INCREMENT dla tabeli `comparator_productprice`
---
+-- --
 ALTER TABLE `comparator_productprice`
   MODIFY `id` bigint NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5569;
 
