@@ -52,9 +52,12 @@ def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)
     offers = ProductOffer.objects.filter(product=product)
     prices = ProductPrice.objects.filter(product_offer__in=offers)
-    observed = ObservedProducts.objects.filter(
-        Q(user=request.user) & Q(product=product)
-    )
+    if request.user.is_authenticated:
+        observed = ObservedProducts.objects.filter(
+            Q(user=request.user) & Q(product=product)
+        )
+    else:
+        observed = False
 
     charts = []
     for offer in offers:
