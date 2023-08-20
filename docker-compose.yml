@@ -13,8 +13,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_DATABASE: djangoapp-db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: admin
 
   panel:
     image: phpmyadmin:latest
