@@ -30,9 +30,7 @@
         <img src="{{ offer.image }}" alt="photo of a gpu" />
     </span>
 
-    <span class="image object">
-        <img src='data:image/png;base64,{% cycle charts.0 charts.1 %}'>
-    </span>
+    {% cycle charts.0|safe charts.1|safe %}
 
     <ul>
     {% for price in prices %}

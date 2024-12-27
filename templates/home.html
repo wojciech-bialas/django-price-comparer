@@ -20,9 +20,7 @@
 
 {% for key, value in charts.items %}
 <h2>Średnia cen na rynku {{ key }}</h2>
-<span class="image object">
-    <img src='data:image/png;base64,{{ value }}'>
-</span>
+{{ value|safe }}
 {% endfor %}
 
 {% endblock %}

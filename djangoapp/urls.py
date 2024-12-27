@@ -16,10 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.conf import settings
+from debug_toolbar.toolbar import debug_toolbar_urls
+import debug_toolbar
+
 from comparator.views import home_view, add_product, show_gpu_view, show_cpu_view, show_ram_view, show_product_view, search_view, observe_view, user_observed_view
 from accounts.views import register_view
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path('', home_view, name="home"),
     path('compare-products/show-gpu', show_gpu_view, name="show-gpu"),
@@ -41,5 +46,8 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register', register_view, name='register'),
 
-    path('product/add', add_product, name='add_product')
+    path('product/add', add_product, name='add_product'),
+    
 ]
+
+urlpatterns += [path('__debug__/', include(debug_toolbar.urls))]

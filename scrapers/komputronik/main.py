@@ -30,12 +30,13 @@ class KomputronikScrapper:
         self.main()
 
     def pages(self):
-        pages = self.driver.find_element("css selector", ".text-lg-right > ul:nth-child(1) > li:nth-child(5) > a:nth-child(1)").text
+        pages = self.driver.find_element("css selector", "li.flex:nth-child(8)").text
+        pages = self.driver.find_element("css selector", "li.inline-flex > p:nth-child(2)").text
         return int(pages) if pages is not None else 1
 
     def next(self):
         try:
-            btn = self.driver.find_element("css selector", "div.pagination.text-xs-center.text-lg-right.isp-top-10 > ul > li:last-child > a")
+            btn = self.driver.find_element("css selector", "a.router-link-active.router-link-exact-active.flex.size-full.items-center.justify-center > i.i-arrow-right")
             btn.click()
         except NoSuchElementException as err:
             raise err
@@ -44,87 +45,67 @@ class KomputronikScrapper:
 
     def close_popup(self):
         try:
-            btn = self.driver.find_element("xpath", "/html/body/ktr-site/ktr-cookie-law/div/div/div/div/div[2]/a")
+            btn = self.driver.find_element("xpath", '//*[@id="onetrust-accept-btn-handler"]')
             btn.click()
         except NoSuchElementException as err:
-            raise err        
+            raise err
+    
+    def close_question(self):
+        try:
+            btn = self.driver.find_element("xpath", "/html/body/div/div[2]/div/button[2]")
+            btn.click()
+        except NoSuchElementException as err:
+            raise err
+    
 
     def main(self):
-        self.driver.get(self.links['gpu'])
-        sleep(5)
-        try:
-            self.close_popup()
-        except Exception:
-            pass
+        for cat, link in self.links.items():            
+            self.driver.get(link)
 
-        for cat, page in self.links.items():            
-            sleep(2)
-            for _ in range(1, self.pages()):
+            sleep(10)
+            try:
+                self.close_popup()
+            except Exception:
+                pass
+
+            sleep(10)
+            try:
+                self.close_question()
+            except Exception:
+                pass
+
+            # for _ in range(1, self.pages()):
+            while True:
                 names = self.driver.execute_script('''
-                    return Array.from(document.querySelectorAll("a.blank-link")).map(x => x.innerText)
+                    return Array.from(document.querySelectorAll("h2.line-clamp-3")).map(x => x.innerText)
                     ''')
                     
                 links = self.driver.execute_script('''
-                    return Array.from(document.querySelectorAll("a.blank-link")).map(x => x.href)
+                    return Array.from(document.querySelectorAll("div.md\\\\:col-span-2 > a")).map(x => x.href)
                     ''')
 
                 images = self.driver.execute_script('''
-                    return Array.from(document.querySelectorAll('a.pe2-img > img')).map(x => x.src)
+                    return Array.from(document.querySelectorAll('img.p-8')).map(x => x.src)
                     ''')
 
                 pre_prices = self.driver.execute_script('''
-                    return Array.from(document.querySelectorAll("span.proper")).map(x => x.innerText)
+                    return Array.from(document.querySelectorAll("div.my-2")).map(x => x.innerText)
                     ''')
-
                 prices = [''.join(el[0:-2].split()) for el in pre_prices]
 
                 pre_codes = self.driver.execute_script('''
-                    return Array.from(document.querySelectorAll("div.pe2-codes")).map(x => x.innerText)
+                    return Array.from(document.querySelectorAll("div.mt-6.text-xs.text-gray-gravel > p:nth-of-type(2)")).map(x => x.innerText)
                     ''')
-                    
-                codes = []
-                ex = re.compile(r"\[(.*)\] K")
-                for el in pre_codes:
-                    code = ex.findall(el)
-                    codes.extend(code)
+                codes = [x.split()[2] for x in pre_codes]
 
                 self.send_to_api(names, links, images, prices, codes, cat)
-                self.next()
+
+                try:
+                    self.next()
+                except Exception:
+                    break
+
                 sleep(10)
-
-            self.action.send_keys(Keys.HOME)
-            self.action.perform()
-            sleep(1)
-
-            first_button = self.driver.find_element('css selector', '.at-cat-ELEKTRONIKA > a:nth-child(1) > span:nth-child(2)')
-            hover = self.action.move_to_element(first_button)
-            hover.perform()
-            sleep(1)
-
-            second_button = self.driver.find_element('css selector', 'li.at-cat-KOMPONENTY30 :first-child span')
-            hover = self.action.move_to_element(second_button)
-            hover.perform()
-            sleep(1)
-            if cat == 'gpu':
-                third_button = self.driver.find_element('css selector', 'li.at-cat-KAMINTER :first-child span')
-                hover = self.action.move_to_element(third_button)
-                hover.perform()
-                sleep(1)
-                third_button.click()
-                sleep(1)
-                self.action.send_keys(Keys.ARROW_DOWN)
-                self.action.send_keys(Keys.ARROW_DOWN)
-                self.action.perform()
-            elif cat == 'ram':
-                third_button = self.driver.find_element('css selector', 'ul.dropdown-menulist:nth-child(2) > li:nth-child(2) > a:nth-child(1) > span:nth-child(1)')
-                hover = self.action.move_to_element(third_button)
-                hover.perform()
-                sleep(1)
-                third_button.click()
-                sleep(1)
-                self.action.send_keys(Keys.ARROW_DOWN)
-                self.action.send_keys(Keys.ARROW_DOWN)
-                self.action.perform()
 
         self.driver.quit()
 

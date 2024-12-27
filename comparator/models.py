@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Product(models.Model):
     code = models.CharField(max_length=60)
-    name = models.CharField(max_length=120)
+    name = models.CharField(max_length=250)
     category = models.CharField(max_length=60)
 
 class ProductOffer(models.Model):

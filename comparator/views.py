@@ -52,23 +52,13 @@ def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)
     offers = ProductOffer.objects.filter(product=product)
     prices = ProductPrice.objects.filter(product_offer__in=offers)
+    charts = [
+        Chart().get_product_chart(offer) for offer in offers
+    ]
+    observed = None
     if request.user.is_authenticated:
-        observed = ObservedProducts.objects.filter(
-            Q(user=request.user) & Q(product=product)
-        )
-    else:
-        observed = False
+        observed = ObservedProducts.objects.filter(user=request.user, product=product).exists()
 
-    charts = []
-    for offer in offers:
-        pp = ProductPrice.objects.filter(product_offer=offer)
-        prices_list = [x.price for x in pp]
-        dates_list = [x.date for x in pp]
-        fig, ax = plt.subplots(figsize=(10,3))
-        ax = plt.plot(dates_list, prices_list)
-        flike = io.BytesIO()
-        fig.savefig(flike)
-        charts.append(base64.b64encode(flike.getvalue()).decode())
     return render(request, 'show-specific.html', {'product': product, 'offers': offers, 'prices': prices, 'charts': charts, 'observed': observed})
 
 def observe_view(request, num):
