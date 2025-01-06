@@ -64,7 +64,11 @@
               {% else %}
                 <li><a href="{% url 'login' %}">Zaloguj</a></li>
               {% endif %}
+              {% if user.is_staff %}
+              <li><a href="scrapers-scripts://run-script">Uruchom skrypty</a></li>
+              {% endif %}
             </ul>
+
           </nav>
 
         <!-- Footer -->
@@ -82,5 +86,10 @@
 		<script src="{% static 'assets/js/breakpoints.min.js' %}"></script>
 		<script src="{% static 'assets/js/util.js' %}"></script>
 		<script src="{% static 'assets/js/main.js' %}"></script>
+
+    <!-- chatbot -->
+    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2024/12/27/21/20241227210808-JTJKX2AW.js"></script>
+    
 </body>
 </html>
