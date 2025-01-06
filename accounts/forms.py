@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import models
+from django.contrib.auth.hashers import make_password
 
 
 class AccountsForm(forms.ModelForm):
@@ -17,3 +18,10 @@ class AccountsForm(forms.ModelForm):
             'email',
             'password'
         ]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)  # Get the user instance without saving
+        user.password = make_password(self.cleaned_data['password'])  # Hash the password
+        if commit:
+            user.save()  # Save the user to the database
+        return user
