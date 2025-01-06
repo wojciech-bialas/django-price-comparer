@@ -32,21 +32,21 @@ def show_gpu_view(request, *args, **kwargs):
     paginator = Paginator(offers, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'show-all.html', {"page_obj": page_obj})
+    return render(request, 'show-all.html', {"page_obj": page_obj, "category": "karty graficzne"})
 
 def show_cpu_view(request, *args, **kwargs):
     offers = ProductOffer.objects.filter(product__category='cpu')
     paginator = Paginator(offers, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'show-all.html', {"page_obj": page_obj})
+    return render(request, 'show-all.html', {"page_obj": page_obj, "category": "procesory"})
 
 def show_ram_view(request, *args, **kwargs):
     offers = ProductOffer.objects.filter(product__category='ram')
     paginator = Paginator(offers, 25)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'show-all.html', {"page_obj": page_obj})
+    return render(request, 'show-all.html', {"page_obj": page_obj, "category": "pamięci ram"})
 
 def show_product_view(request, num, *args, **kwargs):
     product = Product.objects.get(pk=num)

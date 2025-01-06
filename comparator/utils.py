@@ -11,16 +11,13 @@ class Chart:
         dates = []
 
         for rd in run_dates:
-            # Get a list of all prices for the category on the specific date
             prices = list(ProductPrice.objects.filter(
                 Q(date=rd.date) & Q(product_offer__product__category=category)
                 ).values_list('price', flat=True))
-
-            # Skip if no prices were recorded for the given date and category
+            
             if len(prices) == 0:
                 continue
 
-            # Compute the average price for the category on that date
             avg_per_day.append(sum(prices) / len(prices))
             dates.append(rd.date)
 
@@ -33,7 +30,7 @@ class Chart:
             name=f'{category} Średnia cena',
             line=dict(color='royalblue', width=2),
             marker=dict(size=6),
-            hovertemplate='<b>Data:</b> %{x}<br><b>Śr. cena:</b> $%{y:.2f}<extra></extra>'
+            hovertemplate='<b>Data:</b> %{x}<br><b>Śr. cena:</b> %{y:.2f} PLN<extra></extra>'
         ))
 
         fig.update_layout(
@@ -45,16 +42,9 @@ class Chart:
             hovermode="x unified"
         )
 
-        # Set `include_mathjax=False` here to prevent MathJax from loading
         chart_html = fig.to_html(full_html=False, include_plotlyjs='cdn', include_mathjax=False, config={'responsive': True})
         
         return chart_html
-        # fig, ax = plt.subplots(figsize=(10,3))
-        # ax = plt.plot(dates, avg_per_day)
-        # flike = io.BytesIO()
-        # fig.savefig(flike)
-        # chart = base64.b64encode(flike.getvalue()).decode()
-        # return chart
 
 
     def make_all_cat_charts(self):
@@ -79,7 +69,7 @@ class Chart:
             name=f'{offer.product.name} Trend cenowy',
             line=dict(color='green', width=2),
             marker=dict(size=6),
-            hovertemplate='<b>Data:</b> %{x}<br><b>Cena:</b> $%{y:.2f}<extra></extra>'
+            hovertemplate='<b>Data:</b> %{x}<br><b>Cena:</b> %{y:.2f} PLN<extra></extra>'
         ))
 
         fig.update_layout(

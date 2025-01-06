@@ -19,7 +19,7 @@
             <h3>{{ offer.product.name }}</h3>
             <p>Kod producenta: {{ offer.product.code }}</p>
             <ul class="actions">
-                <li><a href="{% url 'show-specific' offer.product.pk %}" class="button">Porównaj</a></li>
+                <li><a href="{% url 'show-specific' offer.product.pk %}" class="button">Zobacz</a></li>
             </ul>
         </article>
         {% endifchanged %}
@@ -29,17 +29,17 @@
     <div class="pagination">
         <span class="step-links">
             {% if page_obj.has_previous %}
-                <a href="?query={{ request.GET.query }}&page=1">&laquo; first</a>
-                <a href="?query={{ request.GET.query }}&page={{ page_obj.previous_page_number }}">previous</a>
+                <a href="?query={{ request.GET.query }}&page=1">&laquo; Pierwsza</a>
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.previous_page_number }}">poprzednia</a>
             {% endif %}
     
             <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}.
             </span>
     
             {% if page_obj.has_next %}
-                <a href="?query={{ request.GET.query }}&page={{ page_obj.next_page_number }}">next</a>
-                <a href="?query={{ request.GET.query }}&page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.next_page_number }}">następna</a>
+                <a href="?query={{ request.GET.query }}&page={{ page_obj.paginator.num_pages }}">ostatnia &raquo;</a>
             {% endif %}
         </span>
     </div>
